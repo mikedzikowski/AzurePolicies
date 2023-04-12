@@ -4,6 +4,7 @@ A set of custom azure policies for deploying the AMD and Nvidia GPU extensions o
 To import the policy using PowerShell:
 
 Example:
+
 New-AzPolicyDefinition -Name 'amdGpu' -DisplayName 'amd GPU Test' -Policy '.\amd_gpu_policy copy.json'
 
 
