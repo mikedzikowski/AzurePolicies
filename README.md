@@ -14,3 +14,9 @@ https://learn.microsoft.com/en-us/azure/virtual-machines/windows/n-series-amd-dr
 
 https://learn.microsoft.com/en-us/azure/virtual-machines/windows/n-series-driver-setup
 
+https://learn.microsoft.com/en-us/azure/virtual-machines/extensions/hpccompute-amd-gpu-windows
+
+https://learn.microsoft.com/en-us/azure/virtual-machines/extensions/hpccompute-gpu-windows
+
+
+
