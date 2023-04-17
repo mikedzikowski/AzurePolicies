@@ -1,7 +1,7 @@
 {
     "properties": {
-        "displayName": "Deploy - Nvidia GPU extension to be enabled on AVD Windows virtual machines",
-        "description": "Nvidia GPU extension to be enabled on AVD Windows virtual machines if the VM size is in the list defined and the extension is not installed",
+        "displayName": "Deploy - Nvidia GPU extension to be enabled on AVD Windows virtual machines and deploys the Nvidia GPU drivers",
+        "description": "Nvidia GPU extension to be enabled on AVD Windows virtual machines deploys the Nvidia GPU driver if the VM size is in the list defined and the extension is not installed",
         "mode": "Indexed",
         "parameters": {
             "listOfAllowedSKUs": {
