@@ -1,7 +1,7 @@
 {
     "properties": {
-        "displayName": "Deploy - AMD GPU extension to be enabled on AVD Windows virtual machines",
-        "description": "AMD GPU extension to be enabled on AVD Windows virtual machines if the VM size is in the list defined and the extension is not installed",
+        "displayName": "Deploy - AMD GPU extension to be enabled on AVD Windows virtual machines and deploys the AMD GPU driver",
+        "description": "AMD GPU extension to be enabled on AVD Windows virtual machines and deploys the AMD GPU driver if the VM size is in the list defined and the extension is not installed",
         "mode": "Indexed",
         "parameters": {
             "listOfAllowedSKUs": {
