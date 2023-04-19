@@ -5,7 +5,7 @@ To import the policy using PowerShell:
 
 New-AzPolicyDefinition -Name 'amdGpu' -DisplayName 'AMD GPU Extension' -Policy '.\policy-definition-es-deploy-amd-gpu-driver.json'
 
-New-AzPolicyDefinition -Name 'nvidiaGpu' -DisplayName 'nVidia GPU Extension' -Policy '.\policy-definition-es-deploy-nvidia-gpu-driver'
+New-AzPolicyDefinition -Name 'nvidiaGpu' -DisplayName 'nVidia GPU Extension' -Policy '.\policy-definition-es-deploy-nvidia-gpu-driver.json'
 
 
 # Reference:
