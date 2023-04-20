@@ -23,12 +23,10 @@
                 }
             },
             "storageAccountName": {
-                "type": "String",
-                "defaultValue": ""
+                "type": "String"
             },
             "fileUris": {
-                "type": "String",
-                "defaultValue": ""
+                "type": "String"
             }
         },
         "policyRule": {
@@ -96,7 +94,9 @@
                                     "vmExtensionName": "MicrosoftMonitoringAgent",
                                     "vmExtensionPublisher": "Microsoft.EnterpriseCloud.Monitoring",
                                     "vmExtensionType": "MicrosoftMonitoringAgent",
-                                    "vmExtensionTypeHandlerVersion": "1.0"
+                                    "vmExtensionTypeHandlerVersion": "1.0",
+                                    "workspacetwokey": "[listKeys(parameters('secondlogAnalyticsWorkspace'), '2015-03-20').primarySharedKey]",
+                                    "wsone": "[reference(parameters('secondlogAnalyticsWorkspace'), '2015-03-20').customerId]"
                                 },
                                 "resources": [
                                     {
@@ -135,7 +135,7 @@
                                                 "timestamp": "[parameters('timeStamp')]"
                                             },
                                             "protectedSettings": {
-                                                "commandToExecute": "powershell.exe  -ExecutionPolicy Unrestricted -File Set-MultiHomeMmaWorkspace.ps1",
+                                                "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File Set-MultiHomeMmaWorkspace.ps1 -workspaceId \"', variables('wsone'), '\" -workspacekey, \"', variables('workspacetwokey'))'\"']",
                                                 "storageAccountName": "[parameters('storageAccountName')]",
                                                 "storageAccountKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
                                                 "managedIdentity": {},
