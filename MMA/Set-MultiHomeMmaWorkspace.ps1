@@ -1,9 +1,9 @@
 [CmdletBinding()]
 param (
-    [parameter(mandatory = $false)]$workspaceId,
-	[parameter(mandatory = $false)]$workspaceKey
+    [parameter(mandatory = $true)]$workspaceName,
+	[parameter(mandatory = $true)]$workspaceResourceGroup
 )
 
 $mma = New-Object -ComObject 'AgentConfigManager.MgmtSvcCfg'
-$mma.AddCloudWorkspace($workspaceId, $workspaceKey, 1)
+$mma.AddCloudWorkspace($workspaceN, $keys.PrimarySharedKey, 1)
 $mma.ReloadConfiguration()
