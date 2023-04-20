@@ -1,0 +1,191 @@
+{
+    "properties": {
+        "displayName": "Deploy - AMD GPU extension to be enabled on AVD Windows virtual machines and deploys the AMD GPU driver",
+        "description": "AMD GPU extension to be enabled on AVD Windows virtual machines and deploys the AMD GPU driver if the VM size is in the list defined and the extension is not installed",
+        "mode": "Indexed",
+        "parameters": {
+            "firstlogAnalyticsWorkspace": {
+                "type": "String",
+                "metadata": {
+                    "displayName": "First Log Analytics workspace",
+                    "description": "First Log Analytics workspace is used to receive performance data. If this workspace is outside of the scope of the assignment you must manually grant 'Log Analytics Contributor' permissions (or similar) to the policy assignment's principal ID.",
+                    "strongType": "omsWorkspace",
+                    "assignPermissions": true
+                },
+                "secondLogAnalyticsWorkspace": {
+                    "type": "String",
+                    "metadata": {
+                        "displayName": "Second Log Analytics workspace",
+                        "description": "Second Log Analytics workspace is used to receive performance data. If this workspace is outside of the scope of the assignment you must manually grant 'Log Analytics Contributor' permissions (or similar) to the policy assignment's principal ID.",
+                        "strongType": "omsWorkspace",
+                        "assignPermissions": true
+                    }
+                },
+                "effect": {
+                    "type": "String",
+                    "metadata": {
+                        "displayName": "Effect",
+                        "description": "Enable or disable the execution of the policy"
+                    },
+                    "allowedValues": [
+                        "DeployIfNotExists",
+                        "Disabled"
+                    ],
+                    "defaultValue": "DeployIfNotExists"
+                },
+                "fileUris": {
+                    "type": "String",
+                    "defaultValue": ""
+                },
+                "policyRule": {
+                    "if": {
+                        "allOf": [
+                            {
+                                "field": "type",
+                                "equals": "Microsoft.Compute/virtualMachines"
+                            },
+                            {
+                                "field": "Microsoft.Compute/virtualMachines/storageProfile.osDisk.osType",
+                                "like": "Windows*"
+                            }
+                        ]
+                    },
+                    "then": {
+                        "effect": "deployIfNotExists",
+                        "details": {
+                            "type": "Microsoft.Compute/virtualMachines/extensions",
+                            "roleDefinitionIds": [
+                                "/providers/microsoft.authorization/roleDefinitions/92aaf0da-9dab-42b6-94a3-d43ce8d16293"
+                            ],
+                            "existenceCondition": {
+                                "allOf": [
+                                    {
+                                        "field": "Microsoft.Compute/virtualMachines/extensions/type",
+                                        "equals": "MicrosoftMonitoringAgent"
+                                    },
+                                    {
+                                        "field": "Microsoft.Compute/virtualMachines/extensions/publisher",
+                                        "equals": "Microsoft.EnterpriseCloud.Monitoring"
+                                    },
+                                    {
+                                        "field": "Microsoft.Compute/virtualMachines/extensions/provisioningState",
+                                        "equals": "Succeeded"
+                                    }
+                                ]
+                            },
+                            "deployment": {
+                                "properties": {
+                                    "mode": "Incremental",
+                                    "template": {
+                                        "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                                        "contentVersion": "1.0.0.0",
+                                        "parameters": {
+                                            "vmName": {
+                                                "type": "string"
+                                            },
+                                            "location": {
+                                                "type": "string"
+                                            },
+                                            "firstlogAnalyticsWorkspace": {
+                                                "type": "string"
+                                            },
+                                            "secondlogAnalyticsWorkspace": {
+                                                "type": "string"
+                                            },
+                                            "fileUris": {
+                                                "type": "string"
+                                            },
+                                            "storageAccountName": {
+                                                "type": "string"
+                                            }
+                                        },
+                                        "variables": {
+                                            "vmExtensionName": "MicrosoftMonitoringAgent",
+                                            "vmExtensionPublisher": "Microsoft.EnterpriseCloud.Monitoring",
+                                            "vmExtensionType": "MicrosoftMonitoringAgent",
+                                            "vmExtensionTypeHandlerVersion": "1.0"
+                                        },
+                                        "resources": [
+                                            {
+                                                "name": "[concat(parameters('vmName'), '/', variables('vmExtensionName'))]",
+                                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                                "location": "[parameters('location')]",
+                                                "apiVersion": "2018-06-01",
+                                                "properties": {
+                                                    "publisher": "[variables('vmExtensionPublisher')]",
+                                                    "type": "[variables('vmExtensionType')]",
+                                                    "typeHandlerVersion": "[variables('vmExtensionTypeHandlerVersion')]",
+                                                    "autoUpgradeMinorVersion": true,
+                                                    "settings": {
+                                                        "workspaceId": "[reference(parameters('firstlogAnalyticsWorkspace'), '2015-03-20').customerId]",
+                                                        "stopOnMultipleConnections": "true"
+                                                    },
+                                                    "protectedSettings": {
+                                                        "workspaceKey": "[listKeys(parameters('firstlogAnalyticsWorkspace'), '2015-03-20').primarySharedKey]"
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "apiVersion": "2018-06-01",
+                                                "type": "Microsoft.Compute/virtualMachines/extensions",
+                                                "name": "[concat(parameters('vmName'), '/multihome-mma')]",
+                                                "location": "[resourceGroup().location]",
+                                                "dependsOn": [
+                                                    "[concat(parameters('vmName'), '/', variables('vmExtensionName'))]"
+                                                ],
+                                                "properties": {
+                                                    "publisher": "Microsoft.Compute",
+                                                    "type": "CustomScriptExtension",
+                                                    "typeHandlerVersion": "1.10",
+                                                    "autoUpgradeMinorVersion": true,
+                                                    "settings": {
+                                                        "timestamp":123456789
+                                                    },
+                                                    "protectedSettings": {
+                                                        "commandToExecute": "powershell.exe  -ExecutionPolicy Unrestricted -File Set-MultiHomeMmaWorkspace.ps1",
+                                                        "storageAccountName": "[parameters('storageAccountName')]",
+                                                        "storageAccountKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), providers('Microsoft.Storage', 'storageAccounts').apiVersions[0]).keys[0].value]",
+                                                        "managedIdentity" : {},
+                                                        "fileUris": [
+                                                            "[parameters('fileUris')]"
+                                                        ]
+                                                    }
+                                                }
+                                            }
+                                        ],
+                                        "outputs": {
+                                            "policy": {
+                                                "type": "string",
+                                                "value": "[concat('Enabled extension for VM', ': ', parameters('vmName'))]"
+                                            }
+                                        }
+                                    },
+                                    "parameters": {
+                                        "vmName": {
+                                            "value": "[field('name')]"
+                                        },
+                                        "location": {
+                                            "value": "[field('location')]"
+                                        },
+                                        "firstlogAnalyticsWorkspace": {
+                                            "value": "[parameters('firstLogAnalyticsWorkspace')]"
+                                        },
+                                        "secondLogAnalyticsWorkspace": {
+                                            "value": "[parameters('secondLogAnalyticsWorkspace')]"
+                                        },
+                                        "fileUris": {
+                                            "value": "[parameters('fileUris')]"
+                                        },
+                                        "storageAccountName":{
+                                            "value": "[parameters('storageAccountName')]"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
