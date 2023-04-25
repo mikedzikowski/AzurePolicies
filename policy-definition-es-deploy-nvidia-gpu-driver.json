@@ -1,8 +1,9 @@
 {
     "properties": {
-        "displayName": "Deploy - Nvidia GPU extension to be enabled on AVD Windows virtual machines and deploys the Nvidia GPU drivers",
-        "description": "Nvidia GPU extension to be enabled on AVD Windows virtual machines deploys the Nvidia GPU driver if the VM size is in the list defined and the extension is not installed",
-        "mode": "Indexed",
+        "name": "policy-deploy-nvidia-gpu-driver",
+        "type": "Microsoft.Authorization/policyDefinitions",
+        "apiVersion": "2021-06-01",
+        "scope": null,
         "parameters": {
             "listOfAllowedSKUs": {
                 "type": "Array",
