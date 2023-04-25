@@ -11,7 +11,7 @@ Requirements:
 To import the policy using PowerShell:
 
 ```plaintext
-New-AzPolicyDefinition -Name 'MMA Multihome' -DisplayName 'MMA Multihome' -Policy '.\policy-definition-es-deploy-mma-multihomescript.json
+New-AzPolicyDefinition -Name 'MMA Multihome' -DisplayName 'MMA Multihome' -Policy '.\policy-definition-es-deploy-mma-multihomescript.json'
 ```
 
 # EXAMPLE ASSIGNMENT
