@@ -1,0 +1,214 @@
+{
+    "properties": {
+        "description": "Deploy Multi-Home Log Analytics extension for Windows virtual machines if the virtual machine image is in the list defined and the extension is not installed. Deprecation notice: The Log Analytics agent is on a deprecation path and won't be supported after August 31, 2024. You must migrate to the replacement 'Azure Monitor agent' prior to that date.",
+        "displayName": "Deploy - Configure Multi-Home Log Analytics extension to be enabled on Windows virtual machines. Currently this policy supports multi-homing two log analytics workspaces.",
+        "mode": "Indexed",
+        "parameters": {
+            "fileUris": {
+                "type": "String"
+            },
+            "secondLogAnalyticsWorkspace": {
+                "metadata": {
+                    "assignPermissions": true,
+                    "description": "Second Log Analytics workspace is used to receive performance data. If this workspace is outside of the scope of the assignment you must manually grant 'Log Analytics Contributor' permissions (or similar) to the policy assignment's principal ID.",
+                    "displayName": "secondLogAnalyticsWorkspace",
+                    "strongType": "omsWorkspace"
+                },
+                "type": "String"
+            },
+            "secondLogAnalyticsWorkspaceRg": {
+                "type": "String"
+            },
+            "storageAccountName": {
+                "type": "String"
+            },
+            "storageAccountResourceGroupName": {
+                "type": "String"
+            },
+            "keyVaultId": {
+                "type": "String"
+            },
+            "wsIdSecretName": {
+                "metadata": {
+                    "description": "The name of the secret."
+                },
+                "type": "string"
+            },
+            "wsKeysecretName": {
+                "metadata": {
+                    "description": "The name of the secret."
+                },
+                "type": "string"
+            }
+        },
+        "policyRule": {
+            "if": {
+                "allOf": [
+                    {
+                        "equals": "Microsoft.Compute/virtualMachines",
+                        "field": "type"
+                    },
+                    {
+                        "allOf": [
+                            {
+                                "field": "Microsoft.Compute/virtualMachines/extensions/type",
+                                "equals": "MicrosoftMonitoringAgent"
+                            },
+                            {
+                                "field": "Microsoft.Compute/virtualMachines/extensions/publisher",
+                                "equals": "Microsoft.EnterpriseCloud.Monitoring"
+                            },
+                            {
+                                "field": "Microsoft.Compute/virtualMachines/extensions/provisioningState",
+                                "equals": "Succeeded"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "then": {
+                "details": {
+                    "deployment": {
+                        "properties": {
+                            "mode": "Incremental",
+                            "parameters": {
+                                "fileUris": {
+                                    "value": "[parameters('fileUris')]"
+                                },
+                                "location": {
+                                    "value": "[field('location')]"
+                                },
+                                "secondLogAnalyticsWorkspace": {
+                                    "value": "[parameters('secondLogAnalyticsWorkspace')]"
+                                },
+                                "secondLogAnalyticsWorkspaceRg": {
+                                    "value": "[parameters('secondLogAnalyticsWorkspaceRg')]"
+                                },
+                                "storageAccountName": {
+                                    "value": "[parameters('storageAccountName')]"
+                                },
+                                "storageAccountResourceGroupName": {
+                                    "value": "[parameters('storageAccountResourceGroupName')]"
+                                },
+                                "timeStamp": {
+                                    "value": "[utcNow()]"
+                                },
+                                "vmName": {
+                                    "value": "[field('name')]"
+                                },
+                                "workspaceId": {
+                                    "reference": {
+                                        "keyVault": {
+                                            "id": "[parameters('keyVaultId')]"
+                                        },
+                                        "secretName": "[parameters('wsKeySecretName')]"
+                                    }
+                                },
+                                "workspaceKey": {
+                                    "reference": {
+                                        "keyVault": {
+                                            "id": "[parameters('keyVaultId')]"
+                                        },
+                                        "secretName": "[parameters('wsIdSecretName')]"
+                                    }
+                                }
+                            },
+                            "template": {
+                                "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                                "contentVersion": "1.0.0.0",
+                                "outputs": {
+                                    "policy": {
+                                        "type": "string",
+                                        "value": "[concat('Enabled extension for VM', ': ', parameters('vmName'))]"
+                                    }
+                                },
+                                "parameters": {
+                                    "fileUris": {
+                                        "type": "string"
+                                    },
+                                    "location": {
+                                        "type": "string"
+                                    },
+                                    "secondLogAnalyticsWorkspaceRg": {
+                                        "type": "string"
+                                    },
+                                    "secondlogAnalyticsWorkspace": {
+                                        "type": "string"
+                                    },
+                                    "storageAccountName": {
+                                        "type": "string"
+                                    },
+                                    "storageAccountResourceGroupName": {
+                                        "type": "string"
+                                    },
+                                    "timeStamp": {
+                                        "type": "String"
+                                    },
+                                    "vmName": {
+                                        "type": "string"
+                                    },
+                                    "workspaceId": {
+                                        "type": "securestring"
+                                    },
+                                    "workspaceKey": {
+                                        "type": "securestring"
+                                    }
+                                },
+                                "resources": [
+                                    {
+                                        "apiVersion": "2018-06-01",
+                                        "location": "[resourceGroup().location]",
+                                        "name": "[concat(parameters('vmName'), '/CustomScriptExtension')]",
+                                        "properties": {
+                                            "autoUpgradeMinorVersion": true,
+                                            "protectedSettings": {
+                                                "commandToExecute": "[concat('powershell.exe -ExecutionPolicy Unrestricted -File Set-MultiHomeMmaWorkspace.ps1 -workspacekey ', variables('wskey'), ' -workspaceId ', variables('wsid'))]",
+                                                "fileUris": [
+                                                    "[parameters('fileUris')]"
+                                                ],
+                                                "storageAccountKey": "[listKeys(resourceId(parameters('storageAccountResourceGroupName'),'Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-04-01').keys[0].value]",
+                                                "storageAccountName": "[parameters('storageAccountName')]"
+                                            },
+                                            "publisher": "Microsoft.Compute",
+                                            "settings": {
+                                                "timestamp": "[parameters('timeStamp')]"
+                                            },
+                                            "type": "CustomScriptExtension",
+                                            "typeHandlerVersion": "1.10"
+                                        },
+                                        "type": "Microsoft.Compute/virtualMachines/extensions"
+                                    }
+                                ],
+                                "variables": {
+                                    "wsid": "[parameters('workspaceId')]",
+                                    "wskey": "[parameters('workspaceKey')]"
+                                }
+                            }
+                        }
+                    },
+                    "existenceCondition": {
+                        "allOf": [
+                            {
+                                "equals": "CustomScriptExtension",
+                                "field": "Microsoft.Compute/virtualMachines/extensions/type"
+                            },
+                            {
+                                "equals": "Microsoft.Compute",
+                                "field": "Microsoft.Compute/virtualMachines/extensions/publisher"
+                            },
+                            {
+                                "equals": "Succeeded",
+                                "field": "Microsoft.Compute/virtualMachines/extensions/provisioningState"
+                            }
+                        ]
+                    },
+                    "roleDefinitionIds": [
+                        "/providers/microsoft.authorization/roleDefinitions/8e3af657-a8ff-443c-a75c-2fe8c4bcb635"
+                    ],
+                    "type": "Microsoft.Compute/virtualMachines/extensions"
+                },
+                "effect": "deployIfNotExists"
+            }
+        }
+    }
+}
