@@ -17,8 +17,3 @@ New-AzPolicyDefinition -Name 'MMA Multihome' -DisplayName 'MMA Multihome' -Polic
 # EXAMPLE #
 
 <img align="left" src="https://github.com/mikedzikowski/AzurePolicies/blob/main/MMA/policymma.png" alt="policy example" width=400px />
-
-
-# REFERENCE #
- 
-https://learn.microsoft.com/en-us/azure/azure-monitor/agents/agent-manage
