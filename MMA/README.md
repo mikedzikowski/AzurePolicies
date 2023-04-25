@@ -16,7 +16,8 @@ New-AzPolicyDefinition -Name 'MMA Multihome' -DisplayName 'MMA Multihome' -Polic
 
 # EXAMPLE ASSIGNMENT
 
-<img align="left" src="https://github.com/mikedzikowski/AzurePolicies/tree/main/MMA/policymma.png" alt="policy example" width=400px />
+<img align="left" src="https://github.com/mikedzikowski/AzurePolicies/blob/main/MMA/policymma.png" alt="policy example" width=400px />
+
 
 # REFERENCE
 
