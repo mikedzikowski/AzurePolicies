@@ -4,13 +4,13 @@ A custom azure policy for deploying an additional workspace to the Microsoft Man
 
 Requirements:
 -Exisiting Key Vault
--Exisisting Secrets for the log analytics workspace id and workspace key 
+-Exisisting Secrets for the log analytics workspace id and workspace key
 -Exisiting Log Analytics Workspace
 -Powershell script Set-MultiHomeMmaWorkspace.ps1 to be uploaded to a storage account and accessible
 
 To import the policy using PowerShell:
 
-New-AzPolicyDefinition -Name 'MMA Multihome' -DisplayName 'MMA Multihome Test' -Policy '.\policy-definition-es-deploy-mma-multihomescript.json
+New-AzPolicyDefinition -Name 'MMA Multihome' -DisplayName 'MMA Multihome' -Policy '.\policy-definition-es-deploy-mma-multihomescript.json
 
 # REFERENCE
 
