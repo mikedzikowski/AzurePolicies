@@ -47,22 +47,6 @@
                     {
                         "equals": "Microsoft.Compute/virtualMachines",
                         "field": "type"
-                    },
-                    {
-                        "allOf": [
-                            {
-                                "field": "Microsoft.Compute/virtualMachines/extensions/type",
-                                "equals": "MicrosoftMonitoringAgent"
-                            },
-                            {
-                                "field": "Microsoft.Compute/virtualMachines/extensions/publisher",
-                                "equals": "Microsoft.EnterpriseCloud.Monitoring"
-                            },
-                            {
-                                "field": "Microsoft.Compute/virtualMachines/extensions/provisioningState",
-                                "equals": "Succeeded"
-                            }
-                        ]
                     }
                 ]
             },
