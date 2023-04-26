@@ -3,6 +3,7 @@
 A custom azure policy for deploying an additional workspace to the Microsoft Management Agent at scale using Policy.
 
 Requirements:
+- MMA deployed via policy
 - Exisiting Key Vault
 - Exisisting secrets for the log analytics workspace id and workspace key. The naming of the secrets is not relevant.
 - Exisiting Log Analytics Workspace
